@@ -1,0 +1,185 @@
+<html>
+<html>
+<head>
+  <title>Easy Comment System</title>
+</head>
+<body style="font-family: Arial; background:#e3f2fd; padding:20px;">
+
+  <h2 style="text-align:center; color:#0d47a1;">Article 1</h2>
+  <p style="text-align:center; color:#01579b;">
+    I am Md Sakib Hossen. I study at AIUB.
+  </p>
+
+  <br>
+
+  <h2 style="text-align:center; color:#0d47a1;">Article 2</h2>
+  <p style="text-align:center; color:#01579b;">
+    I am Md Sakib Hossen. I study at AIUB.
+  </p>
+
+  <hr>
+
+  <table style="width:100%; background:#bbdefb; padding:10px; border-radius:5px;">
+    <tr>
+      <td style="font-weight:bold;">Total Comments:</td>
+      <td id="totalComments" style="color:#0d47a1;">0</td>
+      <td style="font-weight:bold;">Average Rating:</td>
+      <td id="avgRating" style="color:#0d47a1;">No ratings yet</td>
+    </tr>
+  </table>
+  <br>
+
+  <table style="width:100%; background:#e1f5fe; padding:10px; border-radius:8px;">
+    <tr>
+      <td style="width:120px;">Name *</td>
+      <td><input id="name" type="text" style="width:95%; padding:6px; border-radius:4px;"></td>
+    </tr>
+
+    <tr>
+      <td>Email</td>
+      <td><input id="email" type="text" style="width:95%; padding:6px; border-radius:4px;"></td>
+    </tr>
+
+    <tr>
+      <td>Comment *</td>
+      <td>
+        <textarea id="comment" rows="4" maxlength="500" style="width:95%; padding:6px; border-radius:4px;"></textarea>
+        <div style="text-align:right; font-size:12px;">
+          <span id="counter">0</span>/500
+        </div>
+      </td>
+    </tr>
+
+    <tr>
+      <td>Rating</td>
+      <td>
+        <select id="rating" style="padding:5px; border-radius:4px;">
+          <option value="">No Rating</option>
+          <option value="1">1 ★</option>
+          <option value="2">2 ★★</option>
+          <option value="3">3 ★★★</option>
+          <option value="4">4 ★★★★</option>
+          <option value="5">5 ★★★★★</option>
+        </select>
+      </td>
+    </tr>
+
+    <tr>
+      <td></td>
+      <td>
+        <button onclick="addComment()" 
+          style="background:#1e88e5; color:white; padding:8px 14px; border:none; border-radius:5px;">
+          Post
+        </button>
+
+        <button onclick="resetForm()" 
+          style="background:#90caf9; color:#0d47a1; padding:8px 14px; border:none; border-radius:5px;">
+          Reset
+        </button>
+      </td>
+    </tr>
+  </table>
+
+  <br>
+  <h3 style="color:#0d47a1;">All Comments</h3>
+
+
+  <table id="commentsTable" border="1" 
+    style="width:100%; border-collapse:collapse; background:white;">
+    <tr style="background:#64b5f6; color:white;">
+      <th>Name</th>
+      <th>Email</th>
+      <th>Comment</th>
+      <th>Rating</th>
+      <th>Time</th>
+    </tr>
+  </table>
+
+  <script>
+    let comments = [];
+
+    // counter update
+    document.getElementById("comment").addEventListener("input", function(){
+      document.getElementById("counter").textContent = this.value.length;
+    });
+
+    function addComment() {
+      let name = document.getElementById("name").value.trim();
+      let email = document.getElementById("email").value.trim();
+      let comment = document.getElementById("comment").value.trim();
+      let rating = document.getElementById("rating").value;
+
+      // SIMPLE VALIDATION
+      if (name.length < 2) { alert("Name too short"); return; }
+      if (comment.length < 10) { alert("Comment too short"); return; }
+      if (email !== "") {
+        if (!email.includes("@") || !email.includes(".")) {
+          alert("Invalid email");
+          return;
+        }
+      }
+
+      let time = new Date().toLocaleString();
+
+      comments.push({
+        name, email, comment, rating: rating || null, time
+      });
+
+      showComments();
+      updateStats();
+      resetForm();
+    }
+
+    function resetForm() {
+      document.getElementById("name").value = "";
+      document.getElementById("email").value = "";
+      document.getElementById("comment").value = "";
+      document.getElementById("rating").value = "";
+      document.getElementById("counter").textContent = "0";
+    }
+
+    function showComments() {
+      let table = document.getElementById("commentsTable");
+
+      table.innerHTML = `
+        <tr style='background:#64b5f6; color:white;'>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Comment</th>
+          <th>Rating</th>
+          <th>Time</th>
+        </tr>
+      `;
+
+      comments.slice().reverse().forEach(c => {
+        table.innerHTML += `
+          <tr>
+            <td>${c.name}</td>
+            <td>${c.email || "N/A"}</td>
+            <td>${c.comment}</td>
+            <td>${c.rating ? c.rating + " ★" : "—"}</td>
+            <td>${c.time}</td>
+          </tr>
+        `;
+      });
+    }
+
+    function updateStats() {
+      document.getElementById("totalComments").textContent = comments.length;
+
+      let rated = comments.filter(c => c.rating !== null);
+      if (rated.length === 0) {
+        document.getElementById("avgRating").textContent = "No ratings yet";
+        return;
+      }
+
+      let sum = 0;
+      rated.forEach(c => sum += parseInt(c.rating));
+      let avg = (sum / rated.length).toFixed(1);
+
+      document.getElementById("avgRating").textContent = avg + " / 5";
+    }
+  </script>
+
+</body>
+</html>
